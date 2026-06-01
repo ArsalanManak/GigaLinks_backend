@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response, Cookie
 from passlib.context import CryptContext
-from ..models.user import UserIn, UserOut, Token
+from ..models.user import UserIn, LoginIn, UserOut, Token
 from ..db import get_db
 from ..auth.jwt import create_access_token
 from bson import ObjectId
@@ -32,7 +32,7 @@ async def register(user_in: UserIn):
 
 
 @router.post("/login", response_model=Token)
-async def login(user_in: UserIn, response: Response):
+async def login(user_in: LoginIn, response: Response):
     db = get_db()
     user = await db.users.find_one({"email": user_in.email})
     if not user or not verify_password(user_in.password, user.get("password_hash", "")):

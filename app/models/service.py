@@ -8,6 +8,8 @@ class ServiceIn(BaseModel):
     description: str
     icon: Optional[str] = None
     hero_image: Optional[str] = None
+    image_url: Optional[str] = None
+    youtube_url: Optional[str] = None
     sub_services: List[str] = []
 
 

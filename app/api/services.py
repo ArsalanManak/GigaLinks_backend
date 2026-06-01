@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from ..db import get_db
 from bson import ObjectId
 from ..models.service import ServiceIn, ServiceOut
+from .deps import get_current_user
 
 router = APIRouter(prefix="/api/v1/services", tags=["services"])
 
@@ -16,7 +17,7 @@ def _serialize(doc: dict) -> dict:
 
 
 @router.post("/", response_model=ServiceOut)
-async def create_service(payload: ServiceIn):
+async def create_service(payload: ServiceIn, user: dict = Depends(get_current_user)):
     db = get_db()
     doc = payload.dict()
     res = await db.services.insert_one(doc)
@@ -47,7 +48,7 @@ async def get_service(id: str):
 
 
 @router.put("/{id}", response_model=ServiceOut)
-async def update_service(id: str, payload: ServiceIn):
+async def update_service(id: str, payload: ServiceIn, user: dict = Depends(get_current_user)):
     db = get_db()
     data = payload.dict()
     try:
@@ -62,7 +63,7 @@ async def update_service(id: str, payload: ServiceIn):
 
 
 @router.delete("/{id}")
-async def delete_service(id: str):
+async def delete_service(id: str, user: dict = Depends(get_current_user)):
     db = get_db()
     try:
         obj = ObjectId(id)

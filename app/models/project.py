@@ -7,6 +7,7 @@ class ProjectIn(BaseModel):
     service_type: str
     city: str
     cloudinary_urls: List[str] = []
+    youtube_url: Optional[str] = None
     description: Optional[str] = None
     featured: Optional[bool] = False
 

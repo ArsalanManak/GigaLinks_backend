@@ -3,6 +3,7 @@ from typing import List, Optional
 from ..db import get_db
 from bson import ObjectId
 from ..models.project import ProjectIn, ProjectOut
+from .deps import get_current_user
 
 router = APIRouter(prefix="/api/v1/projects", tags=["projects"])
 
@@ -16,7 +17,7 @@ def _serialize(doc: dict) -> dict:
 
 
 @router.post("/", response_model=ProjectOut)
-async def create_project(payload: ProjectIn):
+async def create_project(payload: ProjectIn, user: dict = Depends(get_current_user)):
     db = get_db()
     doc = payload.dict()
     res = await db.projects.insert_one(doc)
@@ -56,7 +57,7 @@ async def get_project(id: str):
 
 
 @router.put("/{id}", response_model=ProjectOut)
-async def update_project(id: str, payload: ProjectIn):
+async def update_project(id: str, payload: ProjectIn, user: dict = Depends(get_current_user)):
     db = get_db()
     data = payload.dict()
     try:
@@ -71,7 +72,7 @@ async def update_project(id: str, payload: ProjectIn):
 
 
 @router.delete("/{id}")
-async def delete_project(id: str):
+async def delete_project(id: str, user: dict = Depends(get_current_user)):
     db = get_db()
     try:
         obj = ObjectId(id)
