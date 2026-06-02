@@ -1,12 +1,10 @@
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
-from passlib.context import CryptContext
+import bcrypt
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def seed():
     uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
@@ -15,14 +13,17 @@ async def seed():
     db = client[db_name]
 
     email = "Gigalink00@gmail.com"
+    hashed = bcrypt.hashpw("11223344".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    
     existing = await db.users.find_one({"email": email})
     if existing:
-        print(f"Admin user {email} already exists.")
+        await db.users.update_one({"email": email}, {"$set": {"password_hash": hashed}})
+        print(f"Admin user {email} already exists. Password updated successfully!")
     else:
         doc = {
             "name": "Admin",
             "email": email,
-            "password_hash": pwd_context.hash("11223344"),
+            "password_hash": hashed,
         }
         await db.users.insert_one(doc)
         print(f"Admin user {email} created successfully!")

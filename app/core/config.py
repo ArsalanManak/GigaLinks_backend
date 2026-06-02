@@ -1,6 +1,8 @@
 import os
 from typing import Any
+from dotenv import load_dotenv
 
+load_dotenv(override=True)
 
 def get_env(key: str, default: Any = None) -> Any:
     return os.environ.get(key, default)

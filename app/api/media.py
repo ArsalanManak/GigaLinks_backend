@@ -17,6 +17,8 @@ def _configure():
 
 @router.post("/upload")
 async def upload_media(file: UploadFile = File(...)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Only image files are allowed. Please use YouTube links for videos.")
     if not (config.CLOUDINARY_CLOUD and config.CLOUDINARY_API_KEY and config.CLOUDINARY_API_SECRET):
         raise HTTPException(status_code=500, detail="Cloudinary not configured")
     _configure()
